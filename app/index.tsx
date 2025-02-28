@@ -1,17 +1,23 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { 
-  View, Text, TouchableOpacity, StyleSheet, Image, 
-  ImageBackground, Animated, ActivityIndicator 
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { useLogin } from '@/services/queries/auth/login';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  ImageBackground,
+  Animated,
+  ActivityIndicator,
+} from "react-native";
+import { useRouter } from "expo-router";
+import { useLogin } from "@/services/queries/auth/login";
 
 const LoginScreen = () => {
   const router = useRouter();
   const { login, logging } = useLogin(() => {
-    router.push('/(tabs)?header=false'); // Navigate on successful login
+    router.push("/(tabs)?header=false"); // Navigate on successful login
   });
 
   const [logoFade] = useState(new Animated.Value(0));
@@ -20,22 +26,47 @@ const LoginScreen = () => {
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(logoFade, { toValue: 1, duration: 1500, useNativeDriver: true }),
-      Animated.timing(logoPosition, { toValue: 0, duration: 1500, useNativeDriver: true }),
+      Animated.timing(logoFade, {
+        toValue: 1,
+        duration: 1500,
+        useNativeDriver: true,
+      }),
+      Animated.timing(logoPosition, {
+        toValue: 0,
+        duration: 1500,
+        useNativeDriver: true,
+      }),
     ]).start();
 
-    Animated.timing(contentFade, { toValue: 1, duration: 1500, delay: 500, useNativeDriver: true }).start();
+    Animated.timing(contentFade, {
+      toValue: 1,
+      duration: 1500,
+      delay: 500,
+      useNativeDriver: true,
+    }).start();
   }, []);
 
   const handleLogin = () => {
-    login({ email: 'thato.meso@sita.co.za' }); // Replace with actual email input
+    login({ email: "thato.meso@sita.co.za" }); // Replace with actual email input
   };
 
   return (
-    <ImageBackground source={require('@/assets/images/login-bg.jpg')} style={styles.container} resizeMode="cover">
+    <ImageBackground
+      source={require("@/assets/images/login-bg.jpg")}
+      style={styles.container}
+      resizeMode="cover"
+    >
       <View style={styles.innerContainer}>
-        <Animated.View style={[styles.logoContainer, { opacity: logoFade, transform: [{ translateY: logoPosition }] }]}>
-          <Image source={require('@/assets/images/logo-bluechip.png')} resizeMode="contain" />
+        <Animated.View
+          style={[
+            styles.logoContainer,
+            { opacity: logoFade, transform: [{ translateY: logoPosition }] },
+          ]}
+        >
+          <Image
+            source={require("@/assets/images/logo-bluechip.png")}
+            resizeMode="contain"
+          />
         </Animated.View>
 
         <Animated.View style={[styles.textContainer, { opacity: contentFade }]}>
@@ -43,17 +74,23 @@ const LoginScreen = () => {
           <Text style={styles.subtitle}>Sign in to get started</Text>
 
           {/* Show loading indicator when logging in */}
-          <TouchableOpacity onPress={handleLogin} disabled={logging} >
+          <TouchableOpacity onPress={handleLogin} disabled={logging}>
             {logging ? (
               <ActivityIndicator color="white" />
             ) : (
-              <Image source={require('@/assets/images/button.png')} resizeMode="contain" />
+              <Image
+                source={require("@/assets/images/button.png")}
+                resizeMode="contain"
+              />
             )}
           </TouchableOpacity>
 
           <View style={styles.tip}>
-            <Image source={require('@/assets/images/Pin.png')} />
-            <Text style={styles.tip_text}>Tip: Ensure you log your activity at the site to keep your records precise.</Text>
+            <Image source={require("@/assets/images/Pin.png")} />
+            <Text style={styles.tip_text}>
+              Tip: Ensure you log your activity at the site to keep your records
+              precise.
+            </Text>
           </View>
         </Animated.View>
       </View>
@@ -62,48 +99,56 @@ const LoginScreen = () => {
 };
 
 const commonStyles = {
-  fontFamily: 'Lexend', // Generalized font family
-  color: 'white',
+  fontFamily: "Lexend", // Generalized font family
+  color: "white",
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, justifyContent: 'center',
+    flex: 1,
+    justifyContent: "center",
   },
   innerContainer: {
-    flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, flexDirection: "column", gap: 40,
-    backgroundColor: '#00002EB2',
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+    flexDirection: "column",
+    gap: 40,
+    backgroundColor: "#00002EB2",
   },
   logoContainer: {
-    justifyContent: 'center', alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   textContainer: {
-    justifyContent: 'center', alignItems: 'center', gap: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 20,
   },
-  title: { 
-    fontSize: 26, 
-    fontWeight: '500', 
-    marginBottom: 20, 
-    ...commonStyles, 
+  title: {
+    fontSize: 26,
+    fontWeight: "500",
+    marginBottom: 20,
+    ...commonStyles,
   },
-  subtitle: { 
-    fontSize: 16, 
-    marginBottom: 20, 
-    ...commonStyles, 
+  subtitle: {
+    fontSize: 16,
+    marginBottom: 20,
+    ...commonStyles,
   },
   tip: {
-    display: "flex", 
-    justifyContent: "center", 
-    flexDirection: "row", 
+    display: "flex",
+    justifyContent: "center",
+    flexDirection: "row",
     gap: 10,
-    ...commonStyles, 
+    ...commonStyles,
   },
-  tip_text: { 
-    fontSize: 12, 
-    ...commonStyles, 
+  tip_text: {
+    fontSize: 12,
+    ...commonStyles,
   },
   // button: { alignItems: 'center', justifyContent: 'center', height: 50 },
 });
-
 
 export default LoginScreen;

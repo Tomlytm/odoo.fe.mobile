@@ -1,10 +1,42 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, TextInput, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import Modal from "react-native-modal";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { MaterialIcons, FontAwesome } from "@expo/vector-icons"; // For icons
+import DropDownPicker from "react-native-dropdown-picker";
+interface ReminderModalProps {
+  isModalVisible: boolean;
+  toggleModal: () => void;
+}
 
-const ReminderModal = ({ isModalVisible, toggleModal }) => {
+const ReminderModal: React.FC<ReminderModalProps> = ({
+  isModalVisible,
+  toggleModal,
+}) => {
+  const [selectedValue, setSelectedValue] = useState("");
   const [description, setDescription] = useState("");
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(false);
+  const [items, setItems] = useState([
+    { label: "Apple", value: "apple" },
+    { label: "Banana", value: "banana" },
+    { label: "Cherry", value: "cherry" },
+  ]);
+
+  const onChangeDate = (event: any, selectedDate?: Date) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(Platform.OS === "ios");
+    setDate(currentDate);
+  };
 
   return (
     <Modal
@@ -19,7 +51,10 @@ const ReminderModal = ({ isModalVisible, toggleModal }) => {
       useNativeDriver
       style={styles.modal}
     >
-      <View style={styles.modalContainer}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.modalContainer}
+      >
         <View style={styles.handle} />
         <Text style={styles.modalHeader}>Set Reminder</Text>
         <View style={styles.divider} />
@@ -28,6 +63,7 @@ const ReminderModal = ({ isModalVisible, toggleModal }) => {
         <TextInput
           style={styles.inputLarge}
           placeholder="Description"
+          placeholderTextColor={"gray"}
           multiline
           value={description}
           onChangeText={setDescription}
@@ -35,20 +71,47 @@ const ReminderModal = ({ isModalVisible, toggleModal }) => {
 
         {/* Date & Time Buttons */}
         <View style={styles.row}>
-          <TouchableOpacity style={styles.dateTimeButton}>
-            <FontAwesome name="calendar" size={16} color="#333" />
-            <Text style={styles.dateTimeText}>Select Date</Text>
+          <TouchableOpacity
+            style={styles.dateTimeButton}
+            // onPress={() => setShowDatePicker(true)}
+          >
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="default"
+              style={{ backgroundColor: "#fff" }}
+              onChange={onChangeDate}
+            />
+            <FontAwesome name="calendar" size={20} color="#333" />
+            {/* <Text style={styles.dateTimeText}>{date.toDateString()}</Text> */}
           </TouchableOpacity>
           <TouchableOpacity style={styles.dateTimeButton}>
-            <MaterialIcons name="access-time" size={16} color="#333" />
-            <Text style={styles.dateTimeText}>Select Time</Text>
+            <DateTimePicker
+              value={date}
+              mode="time"
+              display="default"
+              onChange={onChangeDate}
+            />
+            <MaterialIcons name="access-time" size={20} color="#333" />
           </TouchableOpacity>
         </View>
-
-        {/* Dropdowns */}
-        <TouchableOpacity style={styles.dropdown}>
+        {/* <View style={styles.dropdown}>
           <Text style={styles.dropdownText}>Client</Text>
-        </TouchableOpacity>
+          <TouchableOpacity>
+            <Text style={styles.dropdownText}>Select Client</Text>
+          </TouchableOpacity>
+        </View> */}
+        <DropDownPicker
+          open={openDropdown}
+          value={selectedValue}
+          items={items}
+          setOpen={setOpenDropdown}
+          setValue={setSelectedValue}
+          setItems={setItems}
+          placeholder="Select an option"
+          style={styles.dropdown}
+        />
+
         <TouchableOpacity style={styles.dropdown}>
           <Text style={styles.dropdownText}>Location</Text>
         </TouchableOpacity>
@@ -60,7 +123,7 @@ const ReminderModal = ({ isModalVisible, toggleModal }) => {
         <TouchableOpacity style={styles.saveButton}>
           <Text style={styles.saveButtonText}>Save Reminder</Text>
         </TouchableOpacity>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -69,14 +132,14 @@ const styles = StyleSheet.create({
   modal: {
     justifyContent: "flex-end",
     margin: 0,
-    fontFamily: "Lexend"
+    fontFamily: "Lexend",
   },
   modalContainer: {
     backgroundColor: "white",
-    padding: 20,
+    paddingHorizontal: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    fontFamily: "Lexend"
+    fontFamily: "Lexend",
   },
   handle: {
     width: 40,
@@ -85,28 +148,30 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     alignSelf: "center",
     marginBottom: 30,
-    fontFamily: "Lexend"
+    marginTop: 20,
+    fontFamily: "Lexend",
   },
   modalHeader: {
     fontSize: 18,
-    fontWeight: "bold",
+    marginBottom: 20,
+    // fontWeight: "bold",
     textAlign: "center",
-    fontFamily: "Lexend"
+    fontFamily: "Lexend",
   },
   divider: {
-    height: 1,
-    backgroundColor: "#ccc",
+    height: 3,
+    backgroundColor: "#00002E",
     marginVertical: 10,
   },
   inputLarge: {
-    height: 80,
+    height: 120,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
     padding: 10,
     textAlignVertical: "top",
-    marginBottom: 10,
-    fontFamily: "Lexend"
+    marginBottom: 20,
+    fontFamily: "Lexend",
   },
   row: {
     flexDirection: "row",
@@ -115,14 +180,15 @@ const styles = StyleSheet.create({
   dateTimeButton: {
     flexDirection: "row",
     alignItems: "center",
-    padding: 12,
+    justifyContent: "space-between",
+    padding: 8,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
     flex: 1,
-    justifyContent: "center",
+    // justifyContent: "center",
     marginRight: 5,
-    fontFamily: "Lexend"
+    fontFamily: "Lexend",
   },
   dateTimeText: {
     marginLeft: 8,
@@ -136,8 +202,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: "center",
     paddingHorizontal: 10,
-    marginTop: 10,
-    fontFamily: "Lexend"
+    marginTop: 20,
+    // fontSize: 16,
+    fontFamily: "Lexend",
   },
   dropdownText: {
     fontSize: 16,
@@ -149,13 +216,14 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
     borderRadius: 30,
     marginTop: 15,
+    marginBottom: 50,
     alignItems: "center",
   },
   saveButtonText: {
     fontSize: 16,
     color: "white",
     fontWeight: "semibold",
-    fontFamily: "Lexend"
+    fontFamily: "Lexend",
   },
 });
 
